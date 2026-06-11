@@ -1,0 +1,25 @@
+name: Test et Préparation IA
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Télécharger le modèle IA
+        run: |
+          mkdir -p app/src/main/assets/
+          wget https://huggingface.co/votre-user/votre-modele/resolve/main/qwen2-1.5b-instruct-q4_k_m.gguf -O app/src/main/assets/model.gguf
+
+      - name: Installer Llama.cpp
+        run: sudo apt-get install -y llama-cpp
+
+      - name: Tester la compréhension IA
+        run: |
+          # Teste si l'IA comprend "Allume la lumière"
+          llama-cli -m app/src/main/assets/model.gguf -p "Allume la lumière" -n 10 > result.txt
+          grep -q "CMD_LIGHT_ON" result.txt || (echo "Test échoué !" && exit 1)
+          echo "Test réussi : IA opérationnelle !"
+          
