@@ -1,0 +1,31 @@
+name: Compiler mon application
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Télécharger le modèle (si besoin)
+        run: |
+          mkdir -p app/src/main/assets/
+          # Remplacez par votre lien Hugging Face
+          wget https://huggingface.co/ouzaif/MonDomotique-Qwen2/resolve/main/qwen2-1.5b-instruct-q4_k_m.gguf -O app/src/main/assets/model.gguf
+
+      - name: Compiler avec Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Exporter l'APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
